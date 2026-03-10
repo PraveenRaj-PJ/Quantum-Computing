@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Quiz — Test Your Quantum IQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #020a14;
+    --surface: #06182a;
+    --surface2: #0a2440;
+    --accent: #00f5ff;
+    --accent2: #7b2fff;
+    --accent3: #ff2d78;
+    --gold: #ffd700;
+    --text: #e0f4ff;
+    --text-muted: #5a8aaa;
+    --glow: 0 0 20px rgba(0,245,255,0.4);
+    --glow2: 0 0 20px rgba(123,47,255,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Animated grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,245,255,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,245,255,0.04) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  body::after {
+    content: '';
+    position: fixed;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(ellipse at 30% 20%, rgba(0,245,255,0.05) 0%, transparent 50%),
+                radial-gradient(ellipse at 70% 80%, rgba(123,47,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+    animation: pulse 8s ease-in-out infinite alternate;
+  }
+
+  @keyframes pulse {
+    0% { transform: scale(1) rotate(0deg); }
+    100% { transform: scale(1.1) rotate(3deg); }
+  }
+
+  /* Floating particles */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .particle {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) translateX(50px); opacity: 0; }
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .header .logo {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: none;
+    filter: drop-shadow(0 0 20px rgba(0,245,255,0.5));
+    line-height: 1.1;
+  }
+
+  .header .subtitle {
+    font-family: 'Share Tech Mono', monospace;
+    color: var(--text-muted);
+    font-size: 12px;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  /* Screens */
+  .screen { width: 100%; display: none; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Card */
+  .card {
+    background: linear-gradient(135deg, rgba(6,24,42,0.95), rgba(10,36,64,0.95));
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 16px;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(0,245,255,0.1);
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+  }
+
+  /* Form */
+  .form-group { margin-bottom: 24px; }
+
+  .form-group label {
+    display: block;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .form-group input, .form-group select {
+    width: 100%;
+    background: rgba(0,245,255,0.04);
+    border: 1px solid rgba(0,245,255,0.2);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .form-group input:focus, .form-group select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,245,255,0.1), var(--glow);
+    background: rgba(0,245,255,0.07);
+  }
+
+  .form-group select option { background: var(--surface2); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(rgba(255,255,255,0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn:hover::after { opacity: 1; }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #000;
+    box-shadow: 0 4px 20px rgba(0,245,255,0.3);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,245,255,0.5);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid rgba(0,245,255,0.3);
+    color: var(--accent);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    background: rgba(0,245,255,0.07);
+    box-shadow: var(--glow);
+  }
+
+  .btn-danger {
+    background: linear-gradient(135deg, var(--accent3), #aa0044);
+    color: #fff;
+  }
+
+  .btn:active { transform: scale(0.97); }
+
+  /* Quiz specific */
+  .quiz-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .quiz-progress-text {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+  }
+
+  .score-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--gold);
+    background: rgba(255,215,0,0.1);
+    border: 1px solid rgba(255,215,0,0.3);
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 1px;
+  }
+
+  .progress-bar-wrap {
+    width: 100%;
+    height: 4px;
+    background: rgba(0,245,255,0.1);
+    border-radius: 4px;
+    margin-bottom: 30px;
+    overflow: hidden;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 4px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 10px rgba(0,245,255,0.5);
+  }
+
+  .question-num {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .question-text {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(14px, 2.5vw, 18px);
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+    margin-bottom: 28px;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 560px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .card { padding: 24px; }
+  }
+
+  .option-btn {
+    background: rgba(0,245,255,0.03);
+    border: 1px solid rgba(0,245,255,0.15);
+    border-radius: 10px;
+    padding: 16px 20px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    line-height: 1.4;
+  }
+
+  .option-label {
+    font-family: 'Orbitron', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: rgba(0,245,255,0.1);
+    border: 1px solid rgba(0,245,255,0.3);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--accent);
+    background: rgba(0,245,255,0.08);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0,245,255,0.15);
+  }
+
+  .option-btn:hover:not(:disabled) .option-label {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .option-btn.correct {
+    border-color: #00ff88;
+    background: rgba(0,255,136,0.1);
+    animation: correctPulse 0.5s ease;
+  }
+
+  .option-btn.correct .option-label {
+    background: #00ff88;
+    color: #000;
+    border-color: #00ff88;
+  }
+
+  .option-btn.wrong {
+    border-color: var(--accent3);
+    background: rgba(255,45,120,0.1);
+    animation: wrongShake 0.4s ease;
+  }
+
+  .option-btn.wrong .option-label {
+    background: var(--accent3);
+    color: #fff;
+    border-color: var(--accent3);
+  }
+
+  .option-btn:disabled { cursor: not-allowed; }
+
+  @keyframes correctPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+
+  @keyframes wrongShake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+
+  .feedback-msg {
+    margin-top: 16px;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .feedback-msg.correct {
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    color: #00ff88;
+    display: block;
+  }
+
+  .feedback-msg.wrong {
+    background: rgba(255,45,120,0.1);
+    border: 1px solid rgba(255,45,120,0.3);
+    color: var(--accent3);
+    display: block;
+  }
+
+  .next-btn-wrap {
+    margin-top: 24px;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  /* Results */
+  .result-hero {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .result-score-ring {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 20px;
+    position: relative;
+  }
+
+  .result-score-ring svg {
+    width: 140px;
+    height: 140px;
+    transform: rotate(-90deg);
+  }
+
+  .result-score-ring circle {
+    fill: none;
+    stroke-width: 8;
+    stroke-linecap: round;
+  }
+
+  .ring-bg { stroke: rgba(0,245,255,0.1); }
+  .ring-fill {
+    stroke: url(#ringGrad);
+    stroke-dasharray: 377;
+    stroke-dashoffset: 377;
+    transition: stroke-dashoffset 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .ring-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+  }
+
+  .ring-total {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .result-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(20px, 3vw, 28px);
+    font-weight: 800;
+    margin-bottom: 8px;
+  }
+
+  .result-grade {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+  }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .stat-box {
+    background: rgba(0,245,255,0.04);
+    border: 1px solid rgba(0,245,255,0.12);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-family: 'Orbitron', monospace;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-top: 4px;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  /* Leaderboard */
+  .lb-header {
+    font-family: 'Orbitron', monospace;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .lb-table th {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+  }
+
+  .lb-table td {
+    padding: 12px 12px;
+    font-size: 14px;
+    border-bottom: 1px solid rgba(0,245,255,0.05);
+    vertical-align: middle;
+  }
+
+  .lb-table tr:last-child td { border-bottom: none; }
+
+  .lb-table tr:hover td { background: rgba(0,245,255,0.03); }
+
+  .rank-badge {
+    font-family: 'Orbitron', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .rank-1 { background: rgba(255,215,0,0.2); color: var(--gold); border: 1px solid rgba(255,215,0,0.4); }
+  .rank-2 { background: rgba(192,192,192,0.2); color: #c0c0c0; border: 1px solid rgba(192,192,192,0.4); }
+  .rank-3 { background: rgba(205,127,50,0.2); color: #cd7f32; border: 1px solid rgba(205,127,50,0.4); }
+  .rank-n { background: rgba(0,245,255,0.05); color: var(--text-muted); border: 1px solid rgba(0,245,255,0.1); }
+
+  .lb-score {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  .lb-pct {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 2px;
+  }
+
+  /* Section title */
+  .section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: clamp(18px, 3vw, 24px);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .section-sub {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-bottom: 32px;
+  }
+
+  /* Timer */
+  .timer {
+    font-family: 'Orbitron', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+  }
+
+  .timer.warning { color: var(--accent3); animation: blink 0.5s ease infinite alternate; }
+
+  @keyframes blink { from { opacity: 1; } to { opacity: 0.4; } }
+
+  /* Nav */
+  .nav-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .nav-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: rgba(0,245,255,0.2);
+    transition: all 0.3s;
+  }
+
+  .nav-dot.done { background: var(--accent2); }
+  .nav-dot.active { background: var(--accent); width: 20px; border-radius: 3px; }
+  .nav-dot.wrong-dot { background: var(--accent3); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.2); border-radius: 3px; }
+
+  .highlight { color: var(--accent); }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 24px;
+    border-bottom: 1px solid rgba(0,245,255,0.1);
+  }
+
+  .tab {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.3s;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+</style>
+</head>
+<body>
+
+<div class="particles" id="particles"></div>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">⚛ QUANTUM QUIZ</div>
+    <div class="subtitle">Test Your Quantum Computing Knowledge</div>
+  </div>
+
+  <!-- SCREEN 1: Registration -->
+  <div class="screen active" id="screen-register" style="width:100%; max-width:520px; margin-top:24px;">
+    <div class="card">
+      <div class="section-title">Initialize Session</div>
+      <div class="section-sub">ENTER YOUR CREDENTIALS TO BEGIN</div>
+
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="input-name" placeholder="e.g. Richard Feynman" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="input-email" placeholder="e.g. physicist@lab.edu">
+      </div>
+      <div class="form-group">
+        <label>Experience Level</label>
+        <select id="input-level">
+          <option value="">— Select your level —</option>
+          <option value="Beginner">Beginner — New to Quantum</option>
+          <option value="Intermediate">Intermediate — Know the basics</option>
+          <option value="Advanced">Advanced — Deep understanding</option>
+          <option value="Expert">Expert — Researcher / Engineer</option>
+        </select>
+      </div>
+      <div id="reg-error" style="color:var(--accent3); font-family:'Share Tech Mono', monospace; font-size:12px; margin-bottom:16px; display:none;"></div>
+      <button class="btn btn-primary" onclick="startQuiz()" style="width:100%;">
+        ▶ &nbsp; LAUNCH QUIZ
+      </button>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: Quiz -->
+  <div class="screen" id="screen-quiz" style="width:100%; max-width:720px; margin-top:24px;">
+    <div class="card">
+      <div class="quiz-meta">
+        <div class="quiz-progress-text" id="q-progress">QUESTION 1 / 15</div>
+        <div class="timer" id="q-timer">⏱ 30s</div>
+        <div class="score-badge" id="q-score">★ 0 pts</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="question-num" id="q-num">Q.01</div>
+      <div class="question-text" id="q-text">Loading question...</div>
+      <div class="options-grid" id="q-options"></div>
+      <div class="feedback-msg" id="q-feedback"></div>
+      <div class="next-btn-wrap">
+        <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()" style="display:none;">
+          NEXT →
+        </button>
+      </div>
+      <div class="nav-dots" id="nav-dots"></div>
+    </div>
+  </div>
+
+  <!-- SCREEN 3: Results -->
+  <div class="screen" id="screen-result" style="width:100%; max-width:640px; margin-top:24px;">
+    <div class="card">
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab('result')">Results</div>
+        <div class="tab" onclick="switchTab('leaderboard')">Leaderboard</div>
+        <div class="tab" onclick="switchTab('review')">Review</div>
+      </div>
+
+      <!-- Results Tab -->
+      <div class="tab-panel active" id="tab-result">
+        <div class="result-hero">
+          <div class="result-score-ring">
+            <svg viewBox="0 0 140 140">
+              <defs>
+                <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#00f5ff"/>
+                  <stop offset="100%" style="stop-color:#7b2fff"/>
+                </linearGradient>
+              </defs>
+              <circle class="ring-bg" cx="70" cy="70" r="60"/>
+              <circle class="ring-fill" id="ring-fill" cx="70" cy="70" r="60"/>
+            </svg>
+            <div class="ring-text">
+              <div class="ring-score" id="r-score">0</div>
+              <div class="ring-total" id="r-total">/ 15</div>
+            </div>
+          </div>
+          <div class="result-title" id="r-title">Quiz Complete</div>
+          <div class="result-grade" id="r-grade">COMPUTING RESULTS...</div>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-box">
+            <div class="stat-val" id="stat-correct">0</div>
+            <div class="stat-label">Correct</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-wrong">0</div>
+            <div class="stat-label">Wrong</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-val" id="stat-pct">0%</div>
+            <div class="stat-label">Score</div>
+          </div>
+        </div>
+
+        <div style="background:rgba(0,245,255,0.04); border:1px solid rgba(0,245,255,0.1); border-radius:10px; padding:16px; margin-bottom:24px; font-family:'Share Tech Mono',monospace; font-size:13px; color:var(--text-muted);">
+          <span style="color:var(--accent);">PLAYER › </span><span id="r-name">—</span><br>
+          <span style="color:var(--accent);">LEVEL &nbsp;› </span><span id="r-level">—</span><br>
+          <span style="color:var(--accent);">TIME &nbsp;&nbsp;› </span><span id="r-time">—</span>
+        </div>
+
+        <div class="result-actions">
+          <button class="btn btn-primary" onclick="retakeQuiz()">↺ &nbsp; RETRY</button>
+          <button class="btn btn-secondary" onclick="switchTab('leaderboard')">🏆 &nbsp; SCORES</button>
+        </div>
+      </div>
+
+      <!-- Leaderboard Tab -->
+      <div class="tab-panel" id="tab-leaderboard">
+        <div class="lb-header">🏆 &nbsp; All-Time Leaderboard</div>
+        <div id="lb-content"></div>
+        <div style="margin-top:20px; text-align:center;">
+          <button class="btn btn-danger" onclick="clearScores()" style="font-size:11px; padding:10px 20px;">
+            🗑 Clear All Scores
+          </button>
+        </div>
+      </div>
+
+      <!-- Review Tab -->
+      <div class="tab-panel" id="tab-review">
+        <div class="lb-header">📋 &nbsp; Question Review</div>
+        <div id="review-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ QUESTIONS ============
+const questions = [
+  {
+    q: "What is a qubit in quantum computing?",
+    opts: ["A type of quantum circuit", "The quantum analog of a classical bit that can exist in superposition", "A quantum error-correcting code", "A measurement unit for quantum frequency"],
+    ans: 1,
+    exp: "A qubit is the fundamental unit of quantum information. Unlike a classical bit (0 or 1), a qubit can exist in a superposition of both 0 and 1 simultaneously."
+  },
+  {
+    q: "Which quantum phenomenon allows two particles to be correlated such that measuring one instantly affects the other, regardless of distance?",
+    opts: ["Superposition", "Interference", "Entanglement", "Decoherence"],
+    ans: 2,
+    exp: "Quantum entanglement creates a special correlation between particles. Measuring one entangled particle instantaneously determines the state of its partner, no matter how far apart they are."
+  },
+  {
+    q: "What does Shor's algorithm accomplish?",
+    opts: ["Searches an unsorted database in O(√N) time", "Factors large integers exponentially faster than classical algorithms", "Optimizes quantum error correction", "Simulates quantum chemistry"],
+    ans: 1,
+    exp: "Shor's algorithm, developed by Peter Shor in 1994, can factor large integers in polynomial time, which would break RSA encryption that relies on the difficulty of factoring."
+  },
+  {
+    q: "What is quantum decoherence?",
+    opts: ["The process of measuring quantum states", "A method to increase qubit count", "The loss of quantum properties due to interaction with the environment", "A quantum teleportation protocol"],
+    ans: 2,
+    exp: "Decoherence occurs when qubits interact with their environment, causing them to lose their quantum properties (superposition and entanglement) and behave more classically."
+  },
+  {
+    q: "Grover's algorithm provides a quantum speedup for which type of problem?",
+    opts: ["Integer factorization", "Matrix multiplication", "Searching unsorted databases", "Solving differential equations"],
+    ans: 2,
+    exp: "Grover's algorithm searches an unsorted database of N items in O(√N) time, compared to O(N) classically — a quadratic speedup."
+  },
+  {
+    q: "What is a quantum gate equivalent to the classical NOT gate?",
+    opts: ["Hadamard gate", "CNOT gate", "Pauli-X gate", "Toffoli gate"],
+    ans: 2,
+    exp: "The Pauli-X gate (also called the X gate or bit-flip gate) is the quantum equivalent of the classical NOT gate. It flips |0⟩ to |1⟩ and vice versa."
+  },
+  {
+    q: "Which physical implementation uses superconducting loops cooled to near absolute zero?",
+    opts: ["Ion trap qubits", "Photonic qubits", "Topological qubits", "Superconducting qubits"],
+    ans: 3,
+    exp: "Superconducting qubits are implemented using superconducting circuits cooled to temperatures near absolute zero (~15 millikelvin), used by IBM, Google, and others."
+  },
+  {
+    q: "What does the Hadamard gate do to a qubit in state |0⟩?",
+    opts: ["Converts it to |1⟩", "Creates an equal superposition of |0⟩ and |1⟩", "Entangles it with another qubit", "Measures the qubit's state"],
+    ans: 1,
+    exp: "The Hadamard gate transforms |0⟩ into (|0⟩ + |1⟩)/√2 — an equal superposition of 0 and 1. It's one of the most fundamental quantum gates."
+  },
+  {
+    q: "In 2019, Google claimed 'quantum supremacy' by performing a task in ~200 seconds that would take a classical supercomputer approximately how long?",
+    opts: ["1 hour", "1 day", "10,000 years", "1 million years"],
+    ans: 2,
+    exp: "Google's Sycamore processor completed a specific sampling task in ~200 seconds that Google estimated would take the best classical supercomputer about 10,000 years."
+  },
+  {
+    q: "What is quantum error correction primarily designed to address?",
+    opts: ["Slow computation speeds", "Qubit decoherence and gate errors", "High energy consumption", "Limited qubit connectivity"],
+    ans: 1,
+    exp: "Quantum error correction (QEC) encodes logical qubits into multiple physical qubits to detect and correct errors caused by decoherence and imperfect gate operations."
+  },
+  {
+    q: "The BB84 protocol is a foundational scheme in which field?",
+    opts: ["Quantum simulation", "Quantum cryptography / key distribution", "Quantum machine learning", "Quantum teleportation"],
+    ans: 1,
+    exp: "BB84, proposed by Charles Bennett and Gilles Brassard in 1984, is the first quantum key distribution protocol, enabling theoretically unbreakable secure communication."
+  },
+  {
+    q: "What does the acronym NISQ stand for in quantum computing?",
+    opts: ["Non-Ideal Superposition Quantum", "Noisy Intermediate-Scale Quantum", "Normalized Integrated Simulated Qubit", "Next-generation Isolated Superconducting Quantum"],
+    ans: 1,
+    exp: "NISQ (Noisy Intermediate-Scale Quantum) describes today's quantum devices with 50–1000+ qubits that are not yet fault-tolerant, coined by John Preskill."
+  },
+  {
+    q: "What is quantum teleportation?",
+    opts: ["Moving physical matter through space instantly", "Transmitting quantum states from one location to another using entanglement", "Sending information faster than light", "Cloning a qubit's state to another qubit"],
+    ans: 1,
+    exp: "Quantum teleportation transfers a quantum state (not matter or energy) between locations using a combination of entanglement and classical communication."
+  },
+  {
+    q: "Which quantum computing model uses the adiabatic theorem and is associated with D-Wave?",
+    opts: ["Gate-based model", "Measurement-based model", "Quantum annealing", "Topological model"],
+    ans: 2,
+    exp: "Quantum annealing is used by D-Wave Systems. It exploits quantum tunneling to find optimal solutions and is particularly suited for optimization problems."
+  },
+  {
+    q: "The no-cloning theorem states that it is impossible to:",
+    opts: ["Measure a quantum state without disturbing it", "Create an identical copy of an arbitrary unknown quantum state", "Entangle more than two qubits", "Run quantum algorithms on classical hardware"],
+    ans: 1,
+    exp: "The no-cloning theorem proves that you cannot create a perfect copy of an unknown quantum state. This is a key difference from classical bits and underpins quantum cryptography security."
+  }
+];
+
+// ============ STATE ============
+let currentQ = 0;
+let score = 0;
+let userAnswers = [];
+let correctCount = 0;
+let wrongCount = 0;
+let userData = {};
+let timerInterval;
+let timeLeft = 30;
+let startTime;
+let totalTimeTaken = 0;
+let dotStates = [];
+
+// ============ PARTICLES ============
+function createParticles() {
+  const container = document.getElementById('particles');
+  for (let i = 0; i < 30; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 15) + 's';
+    p.style.animationDelay = (Math.random() * 15) + 's';
+    p.style.width = (1 + Math.random() * 3) + 'px';
+    p.style.height = p.style.width;
+    p.style.opacity = 0;
+    if (Math.random() > 0.5) p.style.background = '#7b2fff';
+    container.appendChild(p);
+  }
+}
+createParticles();
+
+// ============ REGISTER ============
+function startQuiz() {
+  const name = document.getElementById('input-name').value.trim();
+  const email = document.getElementById('input-email').value.trim();
+  const level = document.getElementById('input-level').value;
+  const errEl = document.getElementById('reg-error');
+
+  if (!name) { showError(errEl, '⚠ Please enter your name.'); return; }
+  if (!email || !email.includes('@')) { showError(errEl, '⚠ Please enter a valid email.'); return; }
+  if (!level) { showError(errEl, '⚠ Please select your experience level.'); return; }
+
+  errEl.style.display = 'none';
+  userData = { name, email, level, date: new Date().toLocaleDateString(), time: new Date().toLocaleTimeString() };
+  currentQ = 0; score = 0; userAnswers = []; correctCount = 0; wrongCount = 0;
+  dotStates = new Array(questions.length).fill('pending');
+  startTime = Date.now();
+
+  showScreen('quiz');
+  buildNavDots();
+  loadQuestion();
+}
+
+function showError(el, msg) {
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  setTimeout(() => { el.style.animation = ''; }, 10);
+}
+
+// ============ QUIZ ============
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+}
+
+function buildNavDots() {
+  const container = document.getElementById('nav-dots');
+  container.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    d.id = 'dot-' + i;
+    container.appendChild(d);
+  });
+}
+
+function loadQuestion() {
+  clearInterval(timerInterval);
+  const q = questions[currentQ];
+  const total = questions.length;
+
+  document.getElementById('q-progress').textContent = `QUESTION ${currentQ + 1} / ${total}`;
+  document.getElementById('q-num').textContent = `Q.${String(currentQ + 1).padStart(2, '0')}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-score').textContent = `★ ${score} pts`;
+  document.getElementById('next-btn').style.display = 'none';
+  document.getElementById('q-feedback').className = 'feedback-msg';
+
+  // Progress bar
+  document.getElementById('progress-bar').style.width = ((currentQ / total) * 100) + '%';
+
+  // Options
+  const optContainer = document.getElementById('q-options');
+  optContainer.innerHTML = '';
+  const labels = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-label">${labels[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    optContainer.appendChild(btn);
+  });
+
+  // Update dot
+  updateDot(currentQ, 'active');
+
+  // Timer
+  timeLeft = 30;
+  updateTimer();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    updateTimer();
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      autoTimeout();
+    }
+  }, 1000);
+}
+
+function updateTimer() {
+  const el = document.getElementById('q-timer');
+  el.textContent = `⏱ ${timeLeft}s`;
+  el.className = 'timer' + (timeLeft <= 10 ? ' warning' : '');
+}
+
+function selectAnswer(idx) {
+  clearInterval(timerInterval);
+  const q = questions[currentQ];
+  const buttons = document.querySelectorAll('.option-btn');
+  const feedback = document.getElementById('q-feedback');
+  const isCorrect = idx === q.ans;
+
+  buttons.forEach(b => b.disabled = true);
+  buttons[idx].classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) buttons[q.ans].classList.add('correct');
+
+  if (isCorrect) {
+    score++;
+    correctCount++;
+    dotStates[currentQ] = 'correct';
+    feedback.className = 'feedback-msg correct';
+    feedback.textContent = '✓ Correct! ' + q.exp;
+  } else {
+    wrongCount++;
+    dotStates[currentQ] = 'wrong';
+    feedback.className = 'feedback-msg wrong';
+    feedback.textContent = '✗ Incorrect. ' + q.exp;
+  }
+
+  userAnswers[currentQ] = idx;
+  updateDot(currentQ, isCorrect ? 'done' : 'wrong-dot');
+  document.getElementById('q-score').textContent = `★ ${score} pts`;
+  document.getElementById('next-btn').style.display = 'inline-flex';
+}
+
+function autoTimeout() {
+  const q = questions[currentQ];
+  const buttons = document.querySelectorAll('.option-btn');
+  const feedback = document.getElementById('q-feedback');
+
+  buttons.forEach(b => b.disabled = true);
+  buttons[q.ans].classList.add('correct');
+
+  wrongCount++;
+  dotStates[currentQ] = 'wrong';
+  userAnswers[currentQ] = -1;
+  updateDot(currentQ, 'wrong-dot');
+
+  feedback.className = 'feedback-msg wrong';
+  feedback.textContent = '⏰ Time out! ' + q.exp;
+  document.getElementById('next-btn').style.display = 'inline-flex';
+}
+
+function updateDot(idx, state) {
+  document.querySelectorAll('.nav-dot').forEach((d, i) => {
+    d.className = 'nav-dot';
+    if (i < idx) {
+      if (dotStates[i] === 'wrong') d.classList.add('wrong-dot');
+      else if (dotStates[i] === 'correct') d.classList.add('done');
+    } else if (i === idx) {
+      d.classList.add(state === 'active' ? 'active' : state);
+    }
+  });
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= questions.length) {
+    finishQuiz();
+  } else {
+    loadQuestion();
+  }
+}
+
+// ============ RESULTS ============
+function finishQuiz() {
+  clearInterval(timerInterval);
+  totalTimeTaken = Math.floor((Date.now() - startTime) / 1000);
+  const pct = Math.round((score / questions.length) * 100);
+
+  // Save score
+  saveScore();
+
+  // Show result screen
+  showScreen('result');
+
+  document.getElementById('r-score').textContent = score;
+  document.getElementById('r-total').textContent = '/ ' + questions.length;
+  document.getElementById('r-name').textContent = userData.name;
+  document.getElementById('r-level').textContent = userData.level;
+
+  const mins = Math.floor(totalTimeTaken / 60);
+  const secs = totalTimeTaken % 60;
+  document.getElementById('r-time').textContent = `${mins}m ${secs}s`;
+
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-wrong').textContent = wrongCount;
+  document.getElementById('stat-pct').textContent = pct + '%';
+
+  let grade, color;
+  if (pct >= 90) { grade = 'QUANTUM MASTER 🏆'; color = '#ffd700'; }
+  else if (pct >= 75) { grade = 'QUANTUM ENGINEER ⚡'; color = '#00f5ff'; }
+  else if (pct >= 60) { grade = 'QUANTUM LEARNER 🔬'; color = '#7b2fff'; }
+  else if (pct >= 40) { grade = 'QUANTUM NOVICE 📚'; color = '#00ff88'; }
+  else { grade = 'KEEP STUDYING! 💪'; color = '#ff2d78'; }
+
+  document.getElementById('r-title').textContent = userData.name + "'s Results";
+  const gradeEl = document.getElementById('r-grade');
+  gradeEl.textContent = grade;
+  gradeEl.style.color = color;
+
+  // Animate ring
+  setTimeout(() => {
+    const circumference = 2 * Math.PI * 60;
+    const offset = circumference - (pct / 100) * circumference;
+    document.getElementById('ring-fill').style.strokeDashoffset = offset;
+  }, 200);
+
+  renderLeaderboard();
+  renderReview();
+}
+
+// ============ STORAGE ============
+function saveScore() {
+  const scores = getScores();
+  scores.push({
+    name: userData.name,
+    email: userData.email,
+    level: userData.level,
+    score: score,
+    total: questions.length,
+    pct: Math.round((score / questions.length) * 100),
+    time: totalTimeTaken,
+    date: new Date().toLocaleDateString(),
+    timestamp: Date.now()
+  });
+  localStorage.setItem('quantumQuizScores', JSON.stringify(scores));
+}
+
+function getScores() {
+  try {
+    return JSON.parse(localStorage.getItem('quantumQuizScores')) || [];
+  } catch { return []; }
+}
+
+function clearScores() {
+  if (confirm('Clear all recorded scores? This cannot be undone.')) {
+    localStorage.removeItem('quantumQuizScores');
+    renderLeaderboard();
+  }
+}
+
+// ============ LEADERBOARD ============
+function renderLeaderboard() {
+  const scores = getScores().sort((a, b) => b.score - a.score || a.time - b.time);
+  const el = document.getElementById('lb-content');
+
+  if (scores.length === 0) {
+    el.innerHTML = '<div class="empty-state">NO SCORES RECORDED YET</div>';
+    return;
+  }
+
+  let html = `<table class="lb-table">
+    <thead><tr>
+      <th>RANK</th>
+      <th>PLAYER</th>
+      <th>LEVEL</th>
+      <th>SCORE</th>
+      <th>DATE</th>
+    </tr></thead><tbody>`;
+
+  scores.slice(0, 20).forEach((s, i) => {
+    const rankClass = i === 0 ? 'rank-1' : i === 1 ? 'rank-2' : i === 2 ? 'rank-3' : 'rank-n';
+    const isMe = s.timestamp && Date.now() - s.timestamp < 10000;
+    html += `<tr style="${isMe ? 'background:rgba(0,245,255,0.06);' : ''}">
+      <td><span class="rank-badge ${rankClass}">${i + 1}</span></td>
+      <td>
+        <div style="font-weight:500;">${s.name}${isMe ? ' <span style="color:var(--accent);font-size:10px;">YOU</span>' : ''}</div>
+        <div style="font-size:11px;color:var(--text-muted);font-family:\'Share Tech Mono\',monospace;">${s.email}</div>
+      </td>
+      <td style="font-family:\'Share Tech Mono\',monospace;font-size:12px;color:var(--text-muted);">${s.level}</td>
+      <td><div class="lb-score">${s.score}/${s.total}</div><div class="lb-pct">${s.pct}%</div></td>
+      <td style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:var(--text-muted);">${s.date}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+// ============ REVIEW ============
+function renderReview() {
+  const el = document.getElementById('review-content');
+  const labels = ['A', 'B', 'C', 'D'];
+  let html = '';
+
+  questions.forEach((q, i) => {
+    const userAns = userAnswers[i];
+    const isCorrect = userAns === q.ans;
+    const color = isCorrect ? '#00ff88' : '#ff2d78';
+    const icon = isCorrect ? '✓' : '✗';
+
+    html += `<div style="margin-bottom:20px;padding:16px;border:1px solid ${color}33;border-radius:10px;background:${color}08;">
+      <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:${color};letter-spacing:2px;margin-bottom:8px;">${icon} Q${i + 1} — ${isCorrect ? 'CORRECT' : userAns === -1 ? 'TIMED OUT' : 'INCORRECT'}</div>
+      <div style="font-size:14px;margin-bottom:10px;line-height:1.5;">${q.q}</div>`;
+
+    q.opts.forEach((opt, j) => {
+      let bg = 'transparent', border = 'rgba(255,255,255,0.05)', col = 'var(--text-muted)';
+      if (j === q.ans) { bg = 'rgba(0,255,136,0.1)'; border = 'rgba(0,255,136,0.3)'; col = '#00ff88'; }
+      else if (j === userAns && !isCorrect) { bg = 'rgba(255,45,120,0.1)'; border = 'rgba(255,45,120,0.3)'; col = '#ff2d78'; }
+      html += `<div style="display:flex;align-items:center;gap:10px;padding:8px 12px;border:1px solid ${border};border-radius:6px;margin-bottom:6px;background:${bg};color:${col};font-size:13px;">
+        <span style="font-family:'Orbitron',monospace;font-size:10px;font-weight:700;">${labels[j]}</span> ${opt}
+      </div>`;
+    });
+
+    html += `<div style="font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--text-muted);margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">💡 ${q.exp}</div></div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ============ TABS ============
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const names = ['result', 'leaderboard', 'review'];
+    t.className = 'tab' + (names[i] === name ? ' active' : '');
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.className = 'tab-panel');
+  document.getElementById('tab-' + name).className = 'tab-panel active';
+  if (name === 'leaderboard') renderLeaderboard();
+}
+
+// ============ RETRY ============
+function retakeQuiz() {
+  showScreen('register');
+}
+</script>
+</body>
+</html>
