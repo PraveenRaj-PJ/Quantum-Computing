@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quantum Quiz — Test Your Quantum IQ</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#03080f;--surface:#071525;--surface2:#0c2340;
+  --border:rgba(0,200,255,.12);--accent:#00c8ff;--accent2:#6a0fff;
+  --green:#00ffaa;--red:#ff3a6e;--gold:#ffc832;
+  --text:#d8eeff;--muted:#4a7a9a;
+  --ga:0 0 24px rgba(0,200,255,.35);--gb:0 0 24px rgba(106,15,255,.35);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 10%,rgba(0,200,255,.06) 0%,transparent 55%),
+    radial-gradient(ellipse 60% 50% at 85% 90%,rgba(106,15,255,.07) 0%,transparent 55%),
+    linear-gradient(rgba(0,200,255,.025) 1px,transparent 1px) 0 0/44px 44px,
+    linear-gradient(90deg,rgba(0,200,255,.025) 1px,transparent 1px) 0 0/44px 44px;
+  animation:bgP 12s ease-in-out infinite alternate;}
+@keyframes bgP{0%{opacity:1}100%{opacity:.6}}
+#pts{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.pt{position:absolute;border-radius:50%;opacity:0;animation:rise linear infinite;}
+@keyframes rise{0%{transform:translateY(105vh) scale(1);opacity:0}8%{opacity:1}92%{opacity:.7}100%{transform:translateY(-8vh) scale(.4);opacity:0}}
+
+/* LAYOUT */
+.wrap{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:28px 16px 60px;}
+.logo-block{text-align:center;margin-bottom:30px;}
+.logo-mark{font-family:'Orbitron',monospace;font-size:clamp(26px,5vw,44px);font-weight:900;letter-spacing:5px;background:linear-gradient(135deg,#00c8ff 20%,#6a0fff 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 18px rgba(0,200,255,.45));line-height:1.1;}
+.logo-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:6px;color:var(--muted);text-transform:uppercase;margin-top:6px;}
+
+/* SCREENS */
+.screen{display:none;width:100%;animation:fU .38s ease;}
+.screen.on{display:block;}
+@keyframes fU{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* CARD */
+.card{background:linear-gradient(150deg,rgba(7,21,37,.97),rgba(12,35,64,.97));border:1px solid var(--border);border-radius:18px;padding:clamp(22px,5vw,42px);position:relative;overflow:hidden;box-shadow:0 2px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(0,200,255,.08);max-width:680px;margin:0 auto;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),var(--accent2),transparent);}
+
+/* HEADINGS */
+.sh{font-family:'Orbitron',monospace;font-size:clamp(16px,3vw,22px);font-weight:700;margin-bottom:6px;}
+.ss{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;margin-bottom:28px;}
+
+/* FORMS */
+.fg{margin-bottom:20px;}
+.fg label{display:block;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:3px;color:var(--accent);text-transform:uppercase;margin-bottom:7px;}
+.fg input,.fg select{width:100%;background:rgba(0,200,255,.04);border:1px solid rgba(0,200,255,.18);border-radius:9px;padding:13px 17px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:14px;outline:none;transition:all .25s;-webkit-appearance:none;}
+.fg input:focus,.fg select:focus{border-color:var(--accent);background:rgba(0,200,255,.07);box-shadow:0 0 0 3px rgba(0,200,255,.1),var(--ga);}
+.fg select option{background:var(--surface2);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:500px){.row2{grid-template-columns:1fr;}}
+.err-msg{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--red);margin-bottom:14px;display:none;padding:10px 14px;border:1px solid rgba(255,58,110,.25);border-radius:7px;background:rgba(255,58,110,.07);}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:13px 30px;border:none;border-radius:9px;font-family:'Orbitron',monospace;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+.btn::after{content:'';position:absolute;inset:0;background:linear-gradient(rgba(255,255,255,.12),transparent);opacity:0;transition:opacity .25s;}
+.btn:hover::after{opacity:1;}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#000;box-shadow:0 4px 22px rgba(0,200,255,.28);}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,200,255,.45);}
+.btn-ghost{background:transparent;border:1px solid rgba(0,200,255,.25);color:var(--accent);}
+.btn-ghost:hover{border-color:var(--accent);background:rgba(0,200,255,.07);box-shadow:var(--ga);}
+.btn-danger{background:linear-gradient(135deg,var(--red),#990033);color:#fff;box-shadow:0 4px 18px rgba(255,58,110,.25);}
+.btn-danger:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(255,58,110,.4);}
+.btn-green{background:linear-gradient(135deg,var(--green),#008855);color:#000;}
+.btn-green:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,255,170,.35);}
+.btn-sm{padding:9px 18px;font-size:10px;}
+.btn-full{width:100%;}
+
+/* STATUS BARS */
+.sb{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;padding:10px 14px;border-radius:7px;margin-bottom:16px;display:none;}
+.sb.ok{background:rgba(0,255,170,.08);border:1px solid rgba(0,255,170,.25);color:var(--green);display:block;}
+.sb.err{background:rgba(255,58,110,.08);border:1px solid rgba(255,58,110,.25);color:var(--red);display:block;}
+.sb.inf{background:rgba(0,200,255,.08);border:1px solid rgba(0,200,255,.25);color:var(--accent);display:block;}
+.spinner{display:inline-block;width:13px;height:13px;border:2px solid rgba(0,200,255,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-right:6px;}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* QUIZ */
+.qmeta{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:20px;}
+.qprog{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:2px;}
+.tdsp{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--muted);letter-spacing:2px;}
+.tdsp.warn{color:var(--red);animation:blk .5s ease infinite alternate;}
+@keyframes blk{from{opacity:1}to{opacity:.3}}
+.spill{font-family:'Orbitron',monospace;font-size:13px;font-weight:700;color:var(--gold);background:rgba(255,200,50,.1);border:1px solid rgba(255,200,50,.28);padding:5px 14px;border-radius:20px;}
+.pbar-wrap{height:3px;background:rgba(0,200,255,.1);border-radius:3px;margin-bottom:24px;overflow:hidden;}
+.pbar{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:3px;transition:width .55s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(0,200,255,.5);}
+.qnum{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:3px;text-transform:uppercase;margin-bottom:8px;}
+.qtext{font-family:'Orbitron',monospace;font-size:clamp(13px,2.4vw,17px);font-weight:600;line-height:1.55;margin-bottom:24px;}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+@media(max-width:520px){.opts{grid-template-columns:1fr;}}
+.opt{background:rgba(0,200,255,.03);border:1px solid rgba(0,200,255,.13);border-radius:10px;padding:14px 16px;color:var(--text);font-family:'Sora',sans-serif;font-size:13.5px;text-align:left;cursor:pointer;transition:all .22s;display:flex;align-items:flex-start;gap:10px;line-height:1.45;}
+.olbl{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;color:var(--accent);background:rgba(0,200,255,.1);border:1px solid rgba(0,200,255,.25);width:24px;height:24px;border-radius:5px;flex-shrink:0;display:inline-flex;align-items:center;justify-content:center;transition:all .22s;margin-top:1px;}
+.opt:hover:not(:disabled){border-color:var(--accent);background:rgba(0,200,255,.07);transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,200,255,.14);}
+.opt:hover:not(:disabled) .olbl{background:var(--accent);color:#000;}
+.opt:disabled{cursor:not-allowed;}
+.opt.correct{border-color:var(--green);background:rgba(0,255,170,.08);animation:ding .45s ease;}
+.opt.correct .olbl{background:var(--green);color:#000;border-color:var(--green);}
+.opt.wrong{border-color:var(--red);background:rgba(255,58,110,.08);animation:shk .4s ease;}
+.opt.wrong .olbl{background:var(--red);color:#fff;border-color:var(--red);}
+@keyframes ding{0%{transform:scale(1)}50%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+.feed{margin-top:14px;padding:12px 16px;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.5px;line-height:1.6;border-radius:8px;display:none;animation:fU .3s ease;}
+.feed.c{background:rgba(0,255,170,.08);border:1px solid rgba(0,255,170,.25);color:var(--green);display:block;}
+.feed.w{background:rgba(255,58,110,.08);border:1px solid rgba(255,58,110,.25);color:var(--red);display:block;}
+.nxtr{display:flex;justify-content:flex-end;margin-top:20px;}
+.dots{display:flex;gap:5px;justify-content:center;margin-top:18px;flex-wrap:wrap;}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(0,200,255,.18);transition:all .3s;}
+.dot.active{background:var(--accent);width:22px;border-radius:4px;}
+.dot.ok{background:var(--green);}
+.dot.bad{background:var(--red);}
+
+/* RESULTS */
+.tabs-row{display:flex;border-bottom:1px solid rgba(0,200,255,.1);margin-bottom:24px;gap:0;}
+.tab{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;text-transform:uppercase;padding:9px 18px;cursor:pointer;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .25s;}
+.tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.tp{display:none;}
+.tp.on{display:block;animation:fU .3s ease;}
+.rw{width:136px;height:136px;margin:0 auto 16px;position:relative;}
+.rw svg{width:136px;height:136px;transform:rotate(-90deg);}
+circle{fill:none;stroke-width:8;stroke-linecap:round;}
+.rb{stroke:rgba(0,200,255,.1);}
+.rf{stroke:url(#rg);stroke-dasharray:377;stroke-dashoffset:377;transition:stroke-dashoffset 1.5s cubic-bezier(.4,0,.2,1);}
+.ri{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.rscore{font-family:'Orbitron',monospace;font-size:34px;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;}
+.rtot{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:3px;}
+.rhero{text-align:center;margin-bottom:26px;}
+.rtitle{font-family:'Orbitron',monospace;font-size:clamp(17px,3vw,24px);font-weight:800;margin-bottom:6px;}
+.rgrade{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:3px;}
+.srow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:22px;}
+.stat{background:rgba(0,200,255,.04);border:1px solid rgba(0,200,255,.1);border-radius:10px;padding:14px;text-align:center;}
+.sv{font-family:'Orbitron',monospace;font-size:22px;font-weight:700;color:var(--accent);}
+.sl{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;margin-top:4px;}
+.pcard{background:rgba(0,200,255,.04);border:1px solid rgba(0,200,255,.1);border-radius:10px;padding:14px;margin-bottom:20px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:2;color:var(--muted);}
+.pcard span{color:var(--accent);}
+.ract{display:flex;gap:11px;justify-content:center;flex-wrap:wrap;}
+
+/* LEADERBOARD */
+.lbt{font-family:'Orbitron',monospace;font-size:17px;font-weight:700;color:var(--accent);margin-bottom:16px;}
+.lbtbl{width:100%;border-collapse:collapse;}
+.lbtbl th{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;padding:7px 10px;text-align:left;border-bottom:1px solid rgba(0,200,255,.1);}
+.lbtbl td{padding:11px 10px;font-size:13px;border-bottom:1px solid rgba(0,200,255,.05);vertical-align:middle;}
+.lbtbl tr:last-child td{border-bottom:none;}
+.lbtbl tr:hover td{background:rgba(0,200,255,.03);}
+.rnk{font-family:'Orbitron',monospace;font-size:12px;font-weight:700;width:28px;height:28px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;}
+.r1{background:rgba(255,200,50,.18);color:var(--gold);border:1px solid rgba(255,200,50,.35);}
+.r2{background:rgba(200,200,200,.12);color:#ccc;border:1px solid rgba(200,200,200,.3);}
+.r3{background:rgba(205,127,50,.18);color:#cd7f32;border:1px solid rgba(205,127,50,.35);}
+.rn{background:rgba(0,200,255,.06);color:var(--muted);border:1px solid rgba(0,200,255,.12);}
+.lbsc{font-family:'Orbitron',monospace;font-size:14px;font-weight:700;color:var(--accent);}
+.lbpc{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);}
+.youbdg{color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;margin-left:5px;}
+.empty{text-align:center;padding:36px;font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--muted);letter-spacing:2px;}
+
+/* REVIEW */
+.rvi{margin-bottom:16px;padding:14px;border-radius:10px;}
+.rvi.ok{border:1px solid rgba(0,255,170,.2);background:rgba(0,255,170,.05);}
+.rvi.bad{border:1px solid rgba(255,58,110,.2);background:rgba(255,58,110,.05);}
+.rvqn{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:2px;margin-bottom:7px;}
+.rvqt{font-size:13px;margin-bottom:9px;line-height:1.5;}
+.rvo{display:flex;align-items:center;gap:9px;padding:7px 11px;border-radius:6px;margin-bottom:4px;font-size:12.5px;border:1px solid transparent;}
+.rvo.cc{border-color:rgba(0,255,170,.3);background:rgba(0,255,170,.1);color:var(--green);}
+.rvo.cw{border-color:rgba(255,58,110,.3);background:rgba(255,58,110,.1);color:var(--red);}
+.rvo.ans{border-color:rgba(0,255,170,.3);background:rgba(0,255,170,.08);color:var(--green);}
+.rvex{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,.05);line-height:1.6;}
+
+/* ADMIN */
+.abadge{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--red);border:1px solid rgba(255,58,110,.3);padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;}
+.adstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+@media(max-width:600px){.adstats{grid-template-columns:repeat(2,1fr);}}
+.ads{background:rgba(0,200,255,.04);border:1px solid rgba(0,200,255,.1);border-radius:9px;padding:13px;text-align:center;}
+.adsv{font-family:'Orbitron',monospace;font-size:20px;font-weight:700;color:var(--accent);}
+.adsl{font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;margin-top:3px;text-transform:uppercase;}
+.tblw{overflow-x:auto;border-radius:10px;border:1px solid rgba(0,200,255,.1);}
+.atbl{width:100%;border-collapse:collapse;font-size:12px;}
+.atbl th{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:8px 10px;text-align:left;border-bottom:1px solid rgba(0,200,255,.1);white-space:nowrap;}
+.atbl td{padding:10px 10px;border-bottom:1px solid rgba(0,200,255,.05);vertical-align:middle;}
+.atbl tr:hover td{background:rgba(0,200,255,.03);}
+.alink{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);text-decoration:none;letter-spacing:2px;cursor:pointer;transition:color .2s;}
+.alink:hover{color:var(--accent);}
+
+/* SETUP */
+pre#scode{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);white-space:pre-wrap;line-height:1.7;max-height:200px;overflow-y:auto;}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:1px;padding:12px 20px;border-radius:9px;max-width:320px;transform:translateY(80px);opacity:0;transition:all .4s cubic-bezier(.4,0,.2,1);pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.ok{background:rgba(0,255,170,.12);border:1px solid rgba(0,255,170,.3);color:var(--green);}
+.toast.err{background:rgba(255,58,110,.12);border:1px solid rgba(255,58,110,.3);color:var(--red);}
+.toast.inf{background:rgba(0,200,255,.12);border:1px solid rgba(0,200,255,.3);color:var(--accent);}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:rgba(0,200,255,.2);border-radius:3px;}
+</style>
+</head>
+<body>
+<div id="pts"></div>
+<div class="wrap">
+
+  <!-- LOGO -->
+  <div class="logo-block">
+    <div class="logo-mark">⚛ QUANTUM QUIZ</div>
+    <div class="logo-sub">Quantum Computing Challenge</div>
+  </div>
+
+  <!-- ══ SCREEN: SETUP ══ -->
+  <div class="screen on" id="s-setup" style="max-width:620px;">
+    <div class="card">
+      <div class="sh">⚙ One-Time Setup</div>
+      <div class="ss">Connect Google Sheets as your database</div>
+
+      <div style="background:rgba(0,200,255,.05);border:1px solid rgba(0,200,255,.15);border-radius:10px;padding:18px;margin-bottom:22px;font-family:'Share Tech Mono',monospace;font-size:12px;line-height:2.1;color:var(--muted);">
+        <div style="color:var(--accent);font-family:'Orbitron',monospace;font-size:13px;margin-bottom:10px;">3-Step Setup:</div>
+        <div><span style="color:var(--gold);">STEP 1 ›</span> Open <strong style="color:var(--text);">Google Sheets</strong> → create a new blank spreadsheet</div>
+        <div><span style="color:var(--gold);">STEP 2 ›</span> Click <strong style="color:var(--text);">Extensions → Apps Script</strong> → replace all code with the script below → Save (Ctrl+S)</div>
+        <div><span style="color:var(--gold);">STEP 3 ›</span> Click <strong style="color:var(--text);">Deploy → New Deployment → Web App</strong> → "Execute as: Me" → "Who has access: Anyone" → Deploy → copy the URL</div>
+      </div>
+
+      <div style="background:rgba(106,15,255,.08);border:1px solid rgba(106,15,255,.25);border-radius:10px;padding:16px;margin-bottom:22px;">
+        <div style="font-family:'Orbitron',monospace;font-size:11px;color:var(--accent2);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+          <span>📋 Google Apps Script Code</span>
+          <button class="btn btn-ghost btn-sm" onclick="copyScript()">Copy</button>
+        </div>
+        <pre id="scode">const SHEET_NAME = "Scores";
+const ADMIN_PASS = "QuantumAdmin2025";
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(["Timestamp","Name","Email","Level",
+                       "Score","Total","Percentage","Time(s)","Date"]);
+      sheet.getRange(1,1,1,9).setFontWeight("bold");
+    }
+    if (data.action === "submit") {
+      sheet.appendRow([
+        new Date().toISOString(), data.name, data.email,
+        data.level, data.score, data.total,
+        data.pct + "%", data.timeTaken, data.date
+      ]);
+      return resp({ok:true});
+    }
+    if (data.action === "getScores" && data.pass === ADMIN_PASS) {
+      const rows = sheet.getDataRange().getValues();
+      return resp({ok:true, rows:rows});
+    }
+    if (data.action === "clearScores" && data.pass === ADMIN_PASS) {
+      const hdr = sheet.getRange(1,1,1,sheet.getLastColumn()).getValues();
+      sheet.clearContents();
+      sheet.getRange(1,1,1,hdr[0].length).setValues(hdr);
+      sheet.getRange(1,1,1,hdr[0].length).setFontWeight("bold");
+      return resp({ok:true});
+    }
+    return resp({ok:false, msg:"Unauthorized"});
+  } catch(err) {
+    return resp({ok:false, msg:err.toString()});
+  }
+}
+
+function resp(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+      </div>
+
+      <div class="fg">
+        <label>Apps Script Web App URL</label>
+        <input type="url" id="cfg-url" placeholder="https://script.google.com/macros/s/…/exec">
+      </div>
+      <div class="fg">
+        <label>Admin Password (must match ADMIN_PASS in script)</label>
+        <input type="password" id="cfg-pass" placeholder="QuantumAdmin2025" value="QuantumAdmin2025">
+      </div>
+      <div id="setup-err" class="err-msg"></div>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="saveConfig()" style="flex:1;">✓ Save &amp; Start</button>
+        <button class="btn btn-ghost" onclick="skipSetup()" style="flex:1;">Skip (local only)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: REGISTER ══ -->
+  <div class="screen" id="s-register" style="max-width:520px;">
+    <div class="card">
+      <div class="sh">Initialize Session</div>
+      <div class="ss">Enter your details to begin</div>
+      <div class="row2">
+        <div class="fg"><label>First Name</label><input type="text" id="in-fn" placeholder="e.g. Richard" maxlength="30"></div>
+        <div class="fg"><label>Last Name</label><input type="text" id="in-ln" placeholder="e.g. Feynman" maxlength="30"></div>
+      </div>
+      <div class="fg"><label>Email Address</label><input type="email" id="in-em" placeholder="physicist@lab.edu"></div>
+      <div class="fg">
+        <label>Experience Level</label>
+        <select id="in-lv">
+          <option value="">— Select level —</option>
+          <option>Beginner</option><option>Intermediate</option><option>Advanced</option><option>Expert</option>
+        </select>
+      </div>
+      <div id="reg-err" class="err-msg"></div>
+      <button class="btn btn-primary btn-full" onclick="startQuiz()">▶ &nbsp;Launch Quiz</button>
+      <div style="text-align:center;margin-top:18px;">
+        <span class="alink" onclick="goAdmin()">⚙ Admin Panel</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: QUIZ ══ -->
+  <div class="screen" id="s-quiz" style="max-width:720px;">
+    <div class="card">
+      <div class="qmeta">
+        <div class="qprog" id="qprog">QUESTION 1 / 15</div>
+        <div class="tdsp" id="qtimer">⏱ 30s</div>
+        <div class="spill" id="qscore">★ 0 pts</div>
+      </div>
+      <div class="pbar-wrap"><div class="pbar" id="pbar" style="width:0%"></div></div>
+      <div class="qnum" id="qnum">Q.01</div>
+      <div class="qtext" id="qtext"></div>
+      <div class="opts" id="qopts"></div>
+      <div class="feed" id="qfeed"></div>
+      <div class="nxtr"><button class="btn btn-primary" id="nxt-btn" onclick="nextQ()" style="display:none;">NEXT →</button></div>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: RESULTS ══ -->
+  <div class="screen" id="s-result" style="max-width:680px;">
+    <div class="card">
+      <div class="tabs-row">
+        <div class="tab on"  onclick="doTab('result')">Results</div>
+        <div class="tab"     onclick="doTab('lb')">Leaderboard</div>
+        <div class="tab"     onclick="doTab('review')">Review</div>
+      </div>
+      <!-- Results -->
+      <div class="tp on" id="tp-result">
+        <div class="rhero">
+          <div class="rw">
+            <svg viewBox="0 0 136 136">
+              <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#00c8ff"/><stop offset="100%" stop-color="#6a0fff"/>
+              </linearGradient></defs>
+              <circle class="rb" cx="68" cy="68" r="60"/>
+              <circle class="rf" id="rf" cx="68" cy="68" r="60"/>
+            </svg>
+            <div class="ri"><div class="rscore" id="r-score">0</div><div class="rtot" id="r-tot">/ 15</div></div>
+          </div>
+          <div class="rtitle" id="r-title">Quiz Complete</div>
+          <div class="rgrade" id="r-grade"></div>
+        </div>
+        <div class="srow">
+          <div class="stat"><div class="sv" id="st-c">0</div><div class="sl">Correct</div></div>
+          <div class="stat"><div class="sv" id="st-w">0</div><div class="sl">Wrong</div></div>
+          <div class="stat"><div class="sv" id="st-p">0%</div><div class="sl">Score</div></div>
+        </div>
+        <div class="pcard">
+          <span>PLAYER ›</span> <span id="r-name" style="color:var(--text)">—</span><br>
+          <span>EMAIL &nbsp;›</span> <span id="r-email" style="color:var(--text)">—</span><br>
+          <span>LEVEL &nbsp;›</span> <span id="r-level" style="color:var(--text)">—</span><br>
+          <span>TIME &nbsp;&nbsp;›</span> <span id="r-time"  style="color:var(--text)">—</span>
+        </div>
+        <div id="save-sb" class="sb"></div>
+        <div class="ract">
+          <button class="btn btn-primary" onclick="retake()">↺ &nbsp;Retry</button>
+          <button class="btn btn-ghost"   onclick="doTab('lb')">🏆 &nbsp;Leaderboard</button>
+        </div>
+      </div>
+      <!-- Leaderboard -->
+      <div class="tp" id="tp-lb">
+        <div class="lbt">🏆 &nbsp;Leaderboard</div>
+        <div id="lb-sb" class="sb"></div>
+        <div id="lb-body"></div>
+      </div>
+      <!-- Review -->
+      <div class="tp" id="tp-review">
+        <div class="lbt">📋 &nbsp;Answer Review</div>
+        <div id="rv-body"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: ADMIN LOGIN ══ -->
+  <div class="screen" id="s-adminlogin" style="max-width:420px;">
+    <div class="card">
+      <div class="abadge">⚠ Restricted Access</div>
+      <div class="sh">Admin Panel</div>
+      <div class="ss">Authorized Personnel Only</div>
+      <div class="fg">
+        <label>Admin Password</label>
+        <input type="password" id="adm-pw" placeholder="Enter password" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <div id="adm-err" class="err-msg"></div>
+      <div style="display:flex;gap:12px;">
+        <button class="btn btn-primary" onclick="adminLogin()" style="flex:1;">Unlock</button>
+        <button class="btn btn-ghost"   onclick="show('s-register')" style="flex:1;">← Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SCREEN: ADMIN DASHBOARD ══ -->
+  <div class="screen" id="s-admin" style="max-width:960px;width:100%;">
+    <div class="card" style="max-width:960px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:20px;">
+        <div><div class="abadge">⚙ Admin Dashboard</div><div class="sh" style="margin-bottom:0;">Competitor Records</div></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;">
+          <button class="btn btn-green btn-sm"  onclick="exportCSV()">⬇ Export CSV</button>
+          <button class="btn btn-ghost btn-sm"   onclick="refreshAdmin()"><span id="ref-sp"></span>Refresh</button>
+          <button class="btn btn-danger btn-sm"  onclick="adminClear()">🗑 Clear All</button>
+          <button class="btn btn-ghost btn-sm"   onclick="adminLogout()">← Logout</button>
+        </div>
+      </div>
+      <div id="adm-sb" class="sb"></div>
+      <div class="adstats">
+        <div class="ads"><div class="adsv" id="ad-total">—</div><div class="adsl">Competitors</div></div>
+        <div class="ads"><div class="adsv" id="ad-avg">—</div><div class="adsl">Avg Score</div></div>
+        <div class="ads"><div class="adsv" id="ad-top">—</div><div class="adsl">Top Score</div></div>
+        <div class="ads"><div class="adsv" id="ad-pass">—</div><div class="adsl">Pass Rate ≥60%</div></div>
+      </div>
+      <div class="tblw">
+        <table class="atbl">
+          <thead><tr><th>#</th><th>Name</th><th>Email</th><th>Level</th><th>Score</th><th>%</th><th>Time</th><th>Date</th></tr></thead>
+          <tbody id="atbl-body"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody>
+        </table>
+      </div>
+      <div style="margin-top:12px;font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:2px;" id="adm-count"></div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+<div class="toast" id="toast"></div>
+
+<script>
+/* ─── QUESTIONS ─── */
+const QS=[
+  {q:"What is a qubit in quantum computing?",opts:["A quantum error-correcting code","The quantum analog of a classical bit that can exist in superposition","A type of quantum circuit","A measurement unit for quantum frequency"],ans:1,exp:"A qubit is the fundamental unit of quantum information. Unlike a classical bit, a qubit can exist in superposition of both 0 and 1 simultaneously."},
+  {q:"Which quantum phenomenon allows two particles to be correlated so that measuring one instantly affects the other, regardless of distance?",opts:["Superposition","Interference","Entanglement","Decoherence"],ans:2,exp:"Quantum entanglement creates special correlations between particles. Measuring one entangled particle instantly determines the state of its partner, no matter how far apart they are."},
+  {q:"What does Shor's algorithm accomplish?",opts:["Searches unsorted databases in O(√N) time","Factors large integers exponentially faster than classical algorithms","Optimizes quantum error correction","Simulates molecular quantum chemistry"],ans:1,exp:"Shor's algorithm (1994) factors large integers in polynomial time — threatening RSA encryption which relies on the difficulty of factoring."},
+  {q:"What is quantum decoherence?",opts:["The process of measuring quantum states","A method to increase qubit count","The loss of quantum properties due to environmental interaction","A quantum teleportation protocol"],ans:2,exp:"Decoherence occurs when qubits interact with their environment, causing them to lose superposition and entanglement — the main engineering challenge in quantum computing."},
+  {q:"Grover's algorithm provides a quantum speedup for which type of problem?",opts:["Integer factorization","Matrix multiplication","Searching unsorted databases","Solving differential equations"],ans:2,exp:"Grover's algorithm searches an N-item database in O(√N) time — a quadratic speedup over the classical O(N) linear search."},
+  {q:"What is the quantum gate equivalent to the classical NOT gate?",opts:["Hadamard gate","CNOT gate","Pauli-X gate","Toffoli gate"],ans:2,exp:"The Pauli-X gate (bit-flip gate) is the quantum NOT: it maps |0⟩→|1⟩ and |1⟩→|0⟩."},
+  {q:"Which physical implementation uses superconducting loops cooled to near absolute zero?",opts:["Ion trap qubits","Photonic qubits","Topological qubits","Superconducting qubits"],ans:3,exp:"Superconducting qubits are cooled to ~15 millikelvin and are used by IBM, Google, and others — currently the leading qubit technology by qubit count."},
+  {q:"What does the Hadamard gate do to a qubit in state |0⟩?",opts:["Converts it to |1⟩","Creates an equal superposition of |0⟩ and |1⟩","Entangles it with another qubit","Measures the qubit's state"],ans:1,exp:"The Hadamard gate maps |0⟩ to (|0⟩+|1⟩)/√2 — a perfect 50/50 superposition. It is the most fundamental single-qubit gate."},
+  {q:"In 2019, Google claimed 'quantum supremacy' by completing a task in ~200 seconds that a classical supercomputer would take approximately how long?",opts:["1 hour","1 day","10,000 years","1 million years"],ans:2,exp:"Google's Sycamore processor completed a random circuit sampling task in ~200 seconds. Google estimated the same task would take the best classical supercomputer ~10,000 years."},
+  {q:"What is quantum error correction primarily designed to address?",opts:["Slow computation speeds","Qubit decoherence and gate errors","High energy consumption","Limited qubit connectivity"],ans:1,exp:"Quantum error correction (QEC) encodes logical qubits into multiple physical qubits to detect and correct errors from decoherence and imperfect gate operations."},
+  {q:"The BB84 protocol is a foundational scheme in which field?",opts:["Quantum simulation","Quantum key distribution / cryptography","Quantum machine learning","Quantum annealing"],ans:1,exp:"BB84 (Bennett & Brassard, 1984) is the first quantum key distribution protocol, enabling theoretically unbreakable secure communication."},
+  {q:"What does the acronym NISQ stand for?",opts:["Non-Ideal Superposition Quantum","Noisy Intermediate-Scale Quantum","Normalized Integrated Simulated Qubit","Next-gen Isolated Superconducting Quantum"],ans:1,exp:"NISQ (coined by John Preskill) describes today's 50–1000+ qubit devices that are not yet fault-tolerant, representing the current era of quantum hardware."},
+  {q:"What is quantum teleportation?",opts:["Moving physical matter through space instantly","Transmitting a quantum state using entanglement and classical communication","Sending information faster than light","Cloning a qubit's state to another qubit"],ans:1,exp:"Quantum teleportation transfers a quantum state (not matter or energy) between locations using entanglement plus classical communication. It cannot beat the speed of light."},
+  {q:"Which quantum computing model uses the adiabatic theorem and is associated with D-Wave Systems?",opts:["Gate-based model","Measurement-based model","Quantum annealing","Topological model"],ans:2,exp:"D-Wave uses quantum annealing, which exploits quantum tunneling to find optimal solutions — well suited for combinatorial optimization and sampling problems."},
+  {q:"The no-cloning theorem states that it is impossible to:",opts:["Measure a quantum state without disturbing it","Create an identical copy of an arbitrary unknown quantum state","Entangle more than two qubits","Run quantum algorithms on classical hardware"],ans:1,exp:"The no-cloning theorem proves an arbitrary unknown quantum state cannot be perfectly copied — fundamental to quantum cryptography security and a key contrast with classical bits."}
+];
+
+/* ─── STATE ─── */
+let CFG={url:'',pass:''};
+let cQ=0,score=0,correct=0,wrong=0,answers=[],dotStates=[],tmr,timeLeft,t0,user={};
+const TOTAL=QS.length;
+
+/* ─── PARTICLES ─── */
+(()=>{const c=document.getElementById('pts');for(let i=0;i<26;i++){const p=document.createElement('div');p.className='pt';const s=1+Math.random()*3;p.style.cssText=`left:${Math.random()*100}%;width:${s}px;height:${s}px;background:${Math.random()>.5?'#00c8ff':'#6a0fff'};animation-duration:${9+Math.random()*14}s;animation-delay:${Math.random()*18}s;`;c.appendChild(p);}})();
+
+/* ─── INIT ─── */
+window.onload=()=>{
+  const s=localStorage.getItem('qq_cfg');
+  if(s){try{CFG=JSON.parse(s);}catch(e){}};
+  if(CFG.url||CFG.skip){show('s-register');}else{show('s-setup');}
+};
+
+/* ─── HELPERS ─── */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function setErr(id,msg){const e=document.getElementById(id);e.textContent=msg;e.style.display='block';}
+function setSB(id,cls,msg){const e=document.getElementById(id);e.className='sb '+cls;e.innerHTML=msg;}
+let ttmr;
+function toast(msg,type='inf'){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;clearTimeout(ttmr);ttmr=setTimeout(()=>t.classList.remove('show'),3400);}
+
+/* ─── SETUP ─── */
+function saveConfig(){
+  const url=document.getElementById('cfg-url').value.trim();
+  const pass=document.getElementById('cfg-pass').value.trim();
+  if(!url){setErr('setup-err','Please paste your Apps Script Web App URL.');return;}
+  if(!url.startsWith('https://script.google.com')){setErr('setup-err','URL must start with https://script.google.com …');return;}
+  if(!pass){setErr('setup-err','Please enter the admin password.');return;}
+  CFG={url,pass,skip:false};
+  localStorage.setItem('qq_cfg',JSON.stringify(CFG));
+  show('s-register');toast('Configuration saved!','ok');
+}
+function skipSetup(){CFG={url:'',pass:'localonly',skip:true};localStorage.setItem('qq_cfg',JSON.stringify(CFG));show('s-register');}
+function copyScript(){navigator.clipboard.writeText(document.getElementById('scode').textContent).then(()=>toast('Script copied!','ok'));}
+
+/* ─── REGISTER ─── */
+function startQuiz(){
+  const fn=document.getElementById('in-fn').value.trim();
+  const ln=document.getElementById('in-ln').value.trim();
+  const em=document.getElementById('in-em').value.trim();
+  const lv=document.getElementById('in-lv').value;
+  if(!fn||!ln){setErr('reg-err','Please enter your full name.');return;}
+  if(!em||!em.includes('@')){setErr('reg-err','Please enter a valid email address.');return;}
+  if(!lv){setErr('reg-err','Please select your experience level.');return;}
+  document.getElementById('reg-err').style.display='none';
+  user={name:fn+' '+ln,email:em,level:lv,date:new Date().toLocaleDateString()};
+  cQ=0;score=0;correct=0;wrong=0;answers=[];dotStates=new Array(TOTAL).fill('p');t0=Date.now();
+  show('s-quiz');buildDots();loadQ();
+}
+
+/* ─── QUIZ CORE ─── */
+function buildDots(){
+  const el=document.getElementById('dots');el.innerHTML='';
+  QS.forEach((_,i)=>{const d=document.createElement('div');d.className='dot'+(i===0?' active':'');d.id='d'+i;el.appendChild(d);});
+}
+function loadQ(){
+  clearInterval(tmr);
+  const q=QS[cQ];
+  document.getElementById('qprog').textContent=`QUESTION ${cQ+1} / ${TOTAL}`;
+  document.getElementById('qnum').textContent=`Q.${String(cQ+1).padStart(2,'0')}`;
+  document.getElementById('qtext').textContent=q.q;
+  document.getElementById('qscore').textContent=`★ ${score} pts`;
+  document.getElementById('pbar').style.width=`${(cQ/TOTAL)*100}%`;
+  document.getElementById('nxt-btn').style.display='none';
+  document.getElementById('qfeed').className='feed';
+  const oc=document.getElementById('qopts');oc.innerHTML='';
+  ['A','B','C','D'].forEach((l,i)=>{
+    const b=document.createElement('button');b.className='opt';
+    b.innerHTML=`<span class="olbl">${l}</span>${q.opts[i]}`;
+    b.onclick=()=>pick(i);oc.appendChild(b);
+  });
+  refreshDots();
+  timeLeft=30;updTimer();
+  tmr=setInterval(()=>{timeLeft--;updTimer();if(timeLeft<=0){clearInterval(tmr);timeout();}},1000);
+}
+function updTimer(){const e=document.getElementById('qtimer');e.textContent=`⏱ ${timeLeft}s`;e.className='tdsp'+(timeLeft<=10?' warn':'');}
+function pick(idx){
+  clearInterval(tmr);
+  const q=QS[cQ];const btns=document.querySelectorAll('.opt');const fd=document.getElementById('qfeed');
+  btns.forEach(b=>b.disabled=true);
+  const ok=idx===q.ans;
+  btns[idx].classList.add(ok?'correct':'wrong');
+  if(!ok)btns[q.ans].classList.add('correct');
+  if(ok){score++;correct++;dotStates[cQ]='ok';fd.className='feed c';fd.textContent='✓ Correct!  '+q.exp;}
+  else  {wrong++;dotStates[cQ]='bad';fd.className='feed w';fd.textContent='✗ Incorrect.  '+q.exp;}
+  answers[cQ]=idx;
+  document.getElementById('qscore').textContent=`★ ${score} pts`;
+  document.getElementById('nxt-btn').style.display='inline-flex';
+  refreshDots();
+}
+function timeout(){
+  const q=QS[cQ];const btns=document.querySelectorAll('.opt');const fd=document.getElementById('qfeed');
+  btns.forEach(b=>b.disabled=true);btns[q.ans].classList.add('correct');
+  wrong++;dotStates[cQ]='bad';answers[cQ]=-1;
+  fd.className='feed w';fd.textContent='⏰ Time out!  '+q.exp;
+  document.getElementById('nxt-btn').style.display='inline-flex';refreshDots();
+}
+function refreshDots(){
+  QS.forEach((_,i)=>{const d=document.getElementById('d'+i);if(!d)return;d.className='dot';
+    if(i===cQ)d.classList.add('active');
+    else if(dotStates[i]==='ok')d.classList.add('ok');
+    else if(dotStates[i]==='bad')d.classList.add('bad');
+  });
+}
+function nextQ(){cQ++;cQ>=TOTAL?finish():loadQ();}
+
+/* ─── FINISH ─── */
+function finish(){
+  clearInterval(tmr);
+  const elapsed=Math.floor((Date.now()-t0)/1000);
+  const pct=Math.round((score/TOTAL)*100);
+  const m=Math.floor(elapsed/60),s=elapsed%60;
+  const rec={name:user.name,email:user.email,level:user.level,score,total:TOTAL,pct,timeTaken:elapsed,date:user.date,ts:Date.now()};
+  pushLocal(rec);
+  show('s-result');
+  setTimeout(()=>{const c=2*Math.PI*60;document.getElementById('rf').style.strokeDashoffset=c-(pct/100)*c;},150);
+  document.getElementById('r-score').textContent=score;
+  document.getElementById('r-tot').textContent='/ '+TOTAL;
+  document.getElementById('st-c').textContent=correct;
+  document.getElementById('st-w').textContent=wrong;
+  document.getElementById('st-p').textContent=pct+'%';
+  document.getElementById('r-name').textContent=user.name;
+  document.getElementById('r-email').textContent=user.email;
+  document.getElementById('r-level').textContent=user.level;
+  document.getElementById('r-time').textContent=`${m}m ${s}s`;
+  const grades=[[90,'QUANTUM MASTER 🏆','#ffc832'],[75,'QUANTUM ENGINEER ⚡','#00c8ff'],[60,'QUANTUM LEARNER 🔬','#6a0fff'],[40,'QUANTUM NOVICE 📚','#00ffaa'],[0,'KEEP STUDYING 💪','#ff3a6e']];
+  const [,gl,gc]=grades.find(([t])=>pct>=t);
+  document.getElementById('r-title').textContent=user.name.split(' ')[0]+"'s Results";
+  const ge=document.getElementById('r-grade');ge.textContent=gl;ge.style.color=gc;
+  submitSheets(rec);renderLB();renderReview();
+}
+
+/* ─── GOOGLE SHEETS ─── */
+async function submitSheets(rec){
+  const sb='save-sb';
+  if(!CFG.url){setSB(sb,'inf','ℹ Score saved locally (no Sheets URL configured).');return;}
+  setSB(sb,'inf','<span class="spinner"></span>Saving to Google Sheets…');
+  try{
+    const r=await fetch(CFG.url,{method:'POST',body:JSON.stringify({action:'submit',...rec})});
+    const j=await r.json();
+    if(j.ok)setSB(sb,'ok','✓ Score saved to Google Sheets!');
+    else setSB(sb,'err','⚠ Sheets error: '+j.msg);
+  }catch(e){setSB(sb,'err','⚠ Could not reach Google Sheets. Score saved locally.');}
+}
+
+/* ─── LOCAL STORAGE ─── */
+function getLocal(){try{return JSON.parse(localStorage.getItem('qq_scores'))||[];}catch{return [];}}
+function pushLocal(r){const a=getLocal();a.push(r);localStorage.setItem('qq_scores',JSON.stringify(a));}
+function clearLocal(){localStorage.removeItem('qq_scores');}
+
+/* ─── LEADERBOARD ─── */
+function renderLB(){
+  const el=document.getElementById('lb-body');
+  const rows=getLocal().sort((a,b)=>b.score-a.score||a.timeTaken-b.timeTaken);
+  if(!rows.length){el.innerHTML='<div class="empty">NO SCORES YET</div>';return;}
+  let h=`<table class="lbtbl"><thead><tr><th>Rank</th><th>Player</th><th>Level</th><th>Score</th><th>Date</th></tr></thead><tbody>`;
+  rows.slice(0,25).forEach((r,i)=>{
+    const rc=i===0?'r1':i===1?'r2':i===2?'r3':'rn';
+    const isMe=r.ts&&(Date.now()-r.ts<20000);
+    h+=`<tr${isMe?' style="background:rgba(0,200,255,.05)"':''}>
+      <td><span class="rnk ${rc}">${i+1}</span></td>
+      <td>${r.name}${isMe?'<span class="youbdg">YOU</span>':''}<br><span style="font-family:\'Share Tech Mono\',monospace;font-size:10px;color:var(--muted);">${r.email}</span></td>
+      <td style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:var(--muted);">${r.level}</td>
+      <td><div class="lbsc">${r.score}/${r.total}</div><div class="lbpc">${r.pct}%</div></td>
+      <td style="font-family:\'Share Tech Mono\',monospace;font-size:11px;color:var(--muted);">${r.date}</td>
+    </tr>`;
+  });
+  h+='</tbody></table>';
+  el.innerHTML=h;
+  if(CFG.url)setSB('lb-sb','inf','ℹ Showing local cache. Admin panel shows live Google Sheets data.');
+}
+
+/* ─── REVIEW ─── */
+function renderReview(){
+  const el=document.getElementById('rv-body');const ls=['A','B','C','D'];let h='';
+  QS.forEach((q,i)=>{
+    const ua=answers[i];const ok=ua===q.ans;
+    h+=`<div class="rvi ${ok?'ok':'bad'}">
+      <div class="rvqn" style="color:${ok?'var(--green)':'var(--red)'};">${ok?'✓':'✗'} Q${i+1} — ${ok?'CORRECT':ua===-1?'TIMED OUT':'INCORRECT'}</div>
+      <div class="rvqt">${q.q}</div>`;
+    q.opts.forEach((o,j)=>{
+      let c='rvo';
+      if(j===q.ans&&j===ua)c+=' cc';
+      else if(j===ua&&!ok)c+=' cw';
+      else if(j===q.ans)c+=' ans';
+      h+=`<div class="${c}"><span style="font-family:\'Orbitron\',monospace;font-size:10px;font-weight:700;">${ls[j]}</span>${o}</div>`;
+    });
+    h+=`<div class="rvex">💡 ${q.exp}</div></div>`;
+  });
+  el.innerHTML=h;
+}
+
+/* ─── TABS ─── */
+function doTab(name){
+  const map={result:'tp-result',lb:'tp-lb',review:'tp-review'};
+  const names=['result','lb','review'];
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tab').forEach((t,i)=>{t.classList.remove('on');if(names[i]===name)t.classList.add('on');});
+  document.getElementById(map[name]).classList.add('on');
+  if(name==='lb')renderLB();
+}
+function retake(){show('s-register');}
+
+/* ─── ADMIN ─── */
+function goAdmin(){show('s-adminlogin');document.getElementById('adm-pw').value='';document.getElementById('adm-err').style.display='none';}
+function adminLogin(){
+  const pw=document.getElementById('adm-pw').value;
+  if(pw===CFG.pass){show('s-admin');loadAdminData();}
+  else{setErr('adm-err','Incorrect password.');}
+}
+function adminLogout(){show('s-register');}
+
+async function loadAdminData(){
+  const sp=document.getElementById('ref-sp');sp.innerHTML='<span class="spinner"></span>';
+  if(!CFG.url){renderAdminTable(getLocal());sp.innerHTML='';return;}
+  setSB('adm-sb','inf','<span class="spinner"></span>Fetching live data from Google Sheets…');
+  try{
+    const r=await fetch(CFG.url,{method:'POST',body:JSON.stringify({action:'getScores',pass:CFG.pass})});
+    const j=await r.json();
+    if(j.ok){
+      const [hdr,...rows]=j.rows;
+      const data=rows.filter(r=>r[1]).map(r=>({
+        date:r[0]?new Date(r[0]).toLocaleDateString():'',
+        name:r[1]||'',email:r[2]||'',level:r[3]||'',
+        score:Number(r[4])||0,total:Number(r[5])||TOTAL,
+        pct:parseInt(r[6])||0,timeTaken:Number(r[7])||0
+      }));
+      renderAdminTable(data);
+      setSB('adm-sb','ok',`✓ Live data from Google Sheets — ${data.length} record(s).`);
+    }else{
+      setSB('adm-sb','err','⚠ '+j.msg+' — showing local data.');
+      renderAdminTable(getLocal());
+    }
+  }catch(e){
+    setSB('adm-sb','err','⚠ Network error. Showing local data.');
+    renderAdminTable(getLocal());
+  }
+  sp.innerHTML='';
+}
+function refreshAdmin(){loadAdminData();}
+
+function renderAdminTable(rows){
+  const sorted=[...rows].sort((a,b)=>(b.score||0)-(a.score||0)||(a.timeTaken||0)-(b.timeTaken||0));
+  document.getElementById('adm-count').textContent=`TOTAL RECORDS: ${sorted.length}`;
+  const tb=document.getElementById('atbl-body');
+  if(!sorted.length){tb.innerHTML='<tr><td colspan="8" class="empty">NO RECORDS</td></tr>';updateAdStats([]);return;}
+  let h='';
+  sorted.forEach((r,i)=>{
+    const pct=r.pct||Math.round((r.score/(r.total||TOTAL))*100)||0;
+    const pc=pct>=60?'var(--green)':pct>=40?'var(--gold)':'var(--red)';
+    const m=Math.floor((r.timeTaken||0)/60),s=(r.timeTaken||0)%60;
+    h+=`<tr>
+      <td style="color:var(--muted);font-family:'Share Tech Mono',monospace;font-size:11px;">${i+1}</td>
+      <td style="font-weight:500;">${r.name}</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);">${r.email}</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);">${r.level}</td>
+      <td style="font-family:'Orbitron',monospace;font-weight:700;color:var(--accent);">${r.score}/${r.total||TOTAL}</td>
+      <td style="font-family:'Orbitron',monospace;font-weight:700;color:${pc};">${pct}%</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);">${m}m ${s}s</td>
+      <td style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--muted);">${r.date}</td>
+    </tr>`;
+  });
+  tb.innerHTML=h;updateAdStats(sorted);
+}
+
+function updateAdStats(rows){
+  document.getElementById('ad-total').textContent=rows.length;
+  if(!rows.length){['ad-avg','ad-top','ad-pass'].forEach(id=>document.getElementById(id).textContent='—');return;}
+  const pcts=rows.map(r=>r.pct||Math.round((r.score/(r.total||TOTAL))*100)||0);
+  document.getElementById('ad-avg').textContent=Math.round(pcts.reduce((a,b)=>a+b,0)/pcts.length)+'%';
+  document.getElementById('ad-top').textContent=Math.max(...pcts)+'%';
+  document.getElementById('ad-pass').textContent=Math.round(pcts.filter(p=>p>=60).length/pcts.length*100)+'%';
+}
+
+async function adminClear(){
+  if(!confirm('Permanently delete ALL competitor records from Google Sheets AND local storage? This cannot be undone.'))return;
+  clearLocal();
+  if(!CFG.url){renderAdminTable([]);toast('Local scores cleared.','ok');return;}
+  setSB('adm-sb','inf','<span class="spinner"></span>Clearing Google Sheets…');
+  try{
+    const r=await fetch(CFG.url,{method:'POST',body:JSON.stringify({action:'clearScores',pass:CFG.pass})});
+    const j=await r.json();
+    if(j.ok){setSB('adm-sb','ok','✓ All records cleared.');renderAdminTable([]);toast('All scores cleared!','ok');}
+    else setSB('adm-sb','err','⚠ '+j.msg);
+  }catch(e){setSB('adm-sb','err','⚠ Network error.');}
+}
+
+function exportCSV(){
+  const rows=getLocal();
+  if(!rows.length){toast('No data to export.','err');return;}
+  const hdr=['Name','Email','Level','Score','Total','Percentage','Time(s)','Date'];
+  const lines=[hdr.join(','),...rows.map(r=>[r.name,r.email,r.level,r.score,r.total||TOTAL,r.pct+'%',r.timeTaken,r.date].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(','))];
+  const blob=new Blob([lines.join('\n')],{type:'text/csv'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=`quantum_quiz_${new Date().toISOString().slice(0,10)}.csv`;a.click();
+  toast('CSV exported!','ok');
+}
+</script>
+</body>
+</html>
